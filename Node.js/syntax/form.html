@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Form</title>
+</head>
+
+<body>
+    <form action="http://localhost:3000/proceess_create" method="POST"> <!--서버로부터 데이터를 가져올 때, 즉 GET 방식으로 통신할 땐 url에 쿼리스트링이 보이는 것이 괜찮지만, CRUD등, 서버에 있는 데이터에 대한 변경이 있을 땐, url에 정보가 있으면 안된다. 그래서 form method를 post로 변경해줘야한다.-->
+        <p>
+            <input type="text" name="title">
+        </p>
+        <p><textarea name="content" id="" cols="30" rows="10"></textarea></p>
+        <p>
+            <input type="submit">
+        </p>
+
+    </form>
+    <!-- query string 형태로 name을 전송한다. -->
+    <!--서버로부터 데이터를 가져올 때, 즉 GET 방식으로 통신할 땐 url에 쿼리스트링이 보이는 것이 괜찮지만, CRUD등, 서버에 있는 데이터에 대한 변경이 있을 땐, url에 정보가 있으면 안된다. 그래서 form method를 post로 변경해줘야한다.-->
+    <!-- GET 방식은 url에 데이터를 보여주는데, url은 데이터를 무한히 수용할수 없다. 그래서 데이터가 잘릴 수도 있다.
+    사용자가 서버로부터 데이터를 가져올 떄(GET)는 GET 방식을 사용하고,
+    서버에 데이터를 생성, 수정, 삭제 등을 할 땐 반드시 POST 방식을 사용해야 한다. -->
+</body>
+
+</html>
