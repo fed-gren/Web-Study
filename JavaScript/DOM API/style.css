@@ -1,0 +1,22 @@
+.main_content {
+    display: flex;
+}
+.list_title {
+    width: 150px;
+    height: 80px;
+    background-color: rgb(113, 171, 194);
+    color: rgb(29, 17, 41);
+    margin: 10px;
+}
+
+.list_item {
+    width: 150px;
+    height: 80px;
+    background-color: rgb(6, 226, 142);
+    color: rgb(29, 17, 41);
+    margin: 10px;
+}
+
+.btn_next {
+    background-color: rgb(121, 121, 121);
+}

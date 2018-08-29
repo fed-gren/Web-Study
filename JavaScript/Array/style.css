@@ -1,0 +1,35 @@
+html {
+    position: relative;
+    min-height: 100%;
+    margin: 0;
+}
+
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+}
+
+header > .result {
+    background-color: #272626;
+    color: #fff;
+    height: 100px;
+    
+}
+
+#main-content {
+    margin-top : 200px;
+}
+
+footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    background-color: #272626;
+}
