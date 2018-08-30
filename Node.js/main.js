@@ -5,22 +5,43 @@ let qs = require('querystring');
 let template = require('./lib/template');
 let path = require('path');
 let sanitizeHtml = require('sanitize-html');
+let cookie = require('cookie');
+
+function authIsOwner(req, res) {
+    let is_owner = false;        //로그인 상태 파악을 위한 코드
+    let cookies = {};
+    if (req.headers.cookie) {
+        cookies = cookie.parse(req.headers.cookie);
+    }
+    if (cookies.email === 'eblee@ophit.com' && cookies.password === '123!@#') {
+        is_owner = true;
+    }
+    return is_owner;
+}
+
+function authStatusUI(req, res) {
+    let auth_status_ui = `<a href="/login">log in</a>`;
+
+    if (authIsOwner(req, res)) {
+        auth_status_ui = `<a href="/logout_process">logout</a>`;
+    }
+    return auth_status_ui;
+}
 
 let app = http.createServer((req, res) => {
     let _url = req.url;
     let queryData = url.parse(_url, true).query;
     let pathname = url.parse(_url, true).pathname;
-
     if (pathname === '/') {
         if (queryData.id === undefined) {
             fs.readdir('./data', (err, filelist) => {
-                console.log(filelist);
                 let title = 'Welcome';
                 let desc = 'Hello, Node.js';
                 let list = template.list(filelist);
                 let html = template.HTML(title, list, `<h2>${title}</h2>\
                                 <p>${desc}</p>`,
-                    `<a href="/create">create</a>`);
+                    `<a href="/create">create</a>`,
+                    authStatusUI(req, res));
                 res.writeHead(200);
                 res.end(html);  //사용자에게 전송할 데이터
             });
@@ -31,7 +52,7 @@ let app = http.createServer((req, res) => {
                     let title = queryData.id;
                     let sanitized_title = sanitizeHtml(title);
                     let sanitized_desc = sanitizeHtml(desc, {
-                        allowedTags:["h1"]
+                        allowedTags: ["h1"]
                     });
                     let list = template.list(filelist);
                     let html = template.HTML(sanitized_title, list, `<h2>${sanitized_title}</h2>\
@@ -41,7 +62,7 @@ let app = http.createServer((req, res) => {
                                     <form action="/delete_process" method="post">
                                         <input type="hidden" name="id" value="${sanitized_title}">
                                         <input type="submit" value="delete">
-                                    </form>`);
+                                    </form>`, authStatusUI(req, res));
                     res.writeHead(200);
                     res.end(html);
                 });
@@ -50,8 +71,11 @@ let app = http.createServer((req, res) => {
         }
 
     } else if (pathname === "/create") {
+        if(authIsOwner(req, res) === false) {
+            res.end('Login required!');
+            return false;
+        }
         fs.readdir('./data', (err, filelist) => {
-            console.log(filelist);
             let title = 'Web - create';
             let list = template.list(filelist);
             let html = template.HTML(title, list, `<h2>${title}</h2>\
@@ -63,11 +87,15 @@ let app = http.createServer((req, res) => {
             <p>
                 <input type="submit">
             </p>
-        </form>`, ``);
+        </form>`, ``, authStatusUI(req, res));
             res.writeHead(200);
             res.end(html);  //사용자에게 전송할 데이터
         });
     } else if (pathname === "/create_process") {
+        if(authIsOwner(req, res) === false) {
+            res.end('Login required!');
+            return false;
+        }
         let body = '';
         req.on('data', (data) => {      //웹 브라우저가 데이터 요청했는데 그 양이 엄청 많으면 문제가 발생할 수 있다. 그래서 콜백이 실행될때마다 나눠서 데이터를 추가해줌
             body += data;
@@ -89,6 +117,10 @@ let app = http.createServer((req, res) => {
         });
 
     } else if (pathname === "/update") {
+        if(authIsOwner(req, res) === false) {
+            res.end('Login required!');
+            return false;
+        }
         fs.readdir('./data', (err, filelist) => {
             let filtered_id = path.parse(queryData.id).base;
             fs.readFile(`data/${filtered_id}`, 'utf8', (err, desc) => {
@@ -108,13 +140,17 @@ let app = http.createServer((req, res) => {
                                 </form>
                                 `,
                     `<a href="/create">create</a>
-                                <a href="/update?id=${title}">update</a>`);
+                                <a href="/update?id=${title}">update</a>`, authStatusUI(req, res));
                 res.writeHead(200);
                 res.end(html);
             });
         });
 
     } else if (pathname === "/update_process") {
+        if(authIsOwner(req, res) === false) {
+            res.end('Login required!');
+            return false;
+        }
         let body = '';
         req.on('data', (data) => {      //웹 브라우저가 데이터 요청했는데 그 양이 엄청 많으면 문제가 발생할 수 있다. 그래서 콜백이 실행될때마다 나눠서 데이터를 추가해줌
             body += data;
@@ -139,6 +175,10 @@ let app = http.createServer((req, res) => {
             });
         });
     } else if (pathname === "/delete_process") {
+        if(authIsOwner(req, res) === false) {
+            res.end('Login required!');
+            return false;
+        }
         let body = '';
         req.on('data', (data) => {      //웹 브라우저가 데이터 요청했는데 그 양이 엄청 많으면 문제가 발생할 수 있다. 그래서 콜백이 실행될때마다 나눠서 데이터를 추가해줌
             body += data;
@@ -159,9 +199,67 @@ let app = http.createServer((req, res) => {
             });
 
         });
+    } else if (pathname === '/login') {
+        fs.readdir('./data', (err, filelist) => {
+            console.log(filelist);
+            let title = 'Log in';
+
+            let list = template.list(filelist);
+            let html = template.HTML(title, list, `<h2>${title}</h2>\
+                            <form action="login_process" method="POST">
+                            <p><input type="email" name="email" placeholder="email"></p>
+                            <p><input type="password" name="password" placeholder="password"></p>
+                            <p><input type="submit" value="log in"></p>
+                            </form>`,
+                `<a href="/create">create</a>`);
+            res.writeHead(200);
+            res.end(html);  //사용자에게 전송할 데이터
+        });
+    } else if (pathname === "/login_process") {
+        let body = '';
+        req.on('data', (data) => {      //웹 브라우저가 데이터 요청했는데 그 양이 엄청 많으면 문제가 발생할 수 있다. 그래서 콜백이 실행될때마다 나눠서 데이터를 추가해줌
+            body += data;
+        });
+        req.on('end', () => {       //조각조각 들어오다가 더이상 들어올게 없으면 end에 해당하는 콜백함수를 실행하는 것으로 약속되어있는 것이다.
+            let post = qs.parse(body);
+            if (post.email === 'eblee@ophit.com' && post.password === '123!@#') {
+                res.writeHead(302, {
+                    'Set-Cookie': [
+                        `email=${post.email}`,
+                        `password=${post.password}`,
+                        `username=ophit_eb`
+                    ],
+                    Location: `/`
+                });
+                res.end();  //사용자에게 전송할 데이터
+            } else {
+                res.end('Who are you?');  //사용자에게 전송할 데이터
+            }
+        });
+    } else if (pathname === "/logout_process") {
+        if(authIsOwner(req, res) === false) {
+            res.end('Login required!');
+            return false;
+        }
+        let body = '';
+        req.on('data', (data) => {      //웹 브라우저가 데이터 요청했는데 그 양이 엄청 많으면 문제가 발생할 수 있다. 그래서 콜백이 실행될때마다 나눠서 데이터를 추가해줌
+            body += data;
+        });
+        req.on('end', () => {       //조각조각 들어오다가 더이상 들어올게 없으면 end에 해당하는 콜백함수를 실행하는 것으로 약속되어있는 것이다.
+            let post = qs.parse(body);
+            res.writeHead(302, {
+                'Set-Cookie': [
+                    `email=; Max-Age=0`,
+                    `password=; Max-Age=0`,
+                    `username=; Max-Age=0`
+                ],
+                Location: `/`
+            });
+            res.end();  //사용자에게 전송할 데이터
+        });
     } else {
-        res.writeHead(404);     //파일을 찾을 수 없는 경우
-        res.end('Not Found');
-    }
+    res.writeHead(404);     //파일을 찾을 수 없는 경우
+    res.end('Not Found');
+}
 });
 app.listen(3000);

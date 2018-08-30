@@ -1,7 +1,0 @@
-<h1>This is dirty</h1>
-
-<script>
-alert("dirty?");
-</script>
-
-The end.
