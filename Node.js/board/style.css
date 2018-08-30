@@ -1,0 +1,58 @@
+
+
+.wrapper {
+    margin: 0 auto;
+    width: 960px;
+    height: 540px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 5px 10px 18px #888888;
+    border: 1px solid #888888;
+    border-radius: 10px;
+}
+
+#board_title_area {
+    text-align: center;
+}
+
+#list_area {
+    height: calc(100% - 100px);
+}
+
+#list_area > ul {
+    padding: 0;
+}
+
+.list_item {
+    list-style: none;
+}
+
+#list_area article {
+    background-color: rgb(142, 176, 221);
+    border-bottom: 1px solid #000;
+    margin: 12px 0;
+    overflow: hidden;
+}
+
+#list_area article > section {
+    float: left;
+}
+
+#list_area article .list_id {
+    width: 5%;
+    text-align: center;
+}
+
+#list_area article .list_title {
+    width: 80%;
+}
+
+#list_area article .list_date {
+    width: 15%;
+}
+
+#btn_area {
+    text-align: right;
+    height: 30px;
+    line-height: 30px;
+}
+
