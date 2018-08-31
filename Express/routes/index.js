@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var template = require('../lib/template');
+let auth = require('../lib/auth');
 
 router.get('/', (req, res) => {      //route, routing 적당한 경로를 잡아주는 것
     var title = 'Welcome';
@@ -10,7 +11,8 @@ router.get('/', (req, res) => {      //route, routing 적당한 경로를 잡아
       `<h2>${title}</h2>${description}
       <img src="/images/open.jpg" style="width:300px; display:block; margin-top: 10px;" />
       `,
-      `<a href="/topic/create">create</a>`
+      `<a href="/topic/create">create</a>`,
+      auth.status_ui(req,res)
     );
     res.send(html);
   });
