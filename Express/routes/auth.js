@@ -35,94 +35,18 @@ router.post('/login_process', (req, res) => {
         //success
         req.session.is_logined = true;
         req.session.username = auth_data.username;
-
-        res.redirect(302, `/`);
+        req.session.save(() => {
+            res.redirect('/');
+        });     //세션 객체에 있는 데이터를 이 함수가 세션 스토어에 적용하는 작업을 바로 시작한다. 작업이 모두 끝나면 콜백함수 실행
     } else {
         res.end('Who are you????');
     }
     
 });
 
-/*
-
-router.post('/create_process', (req, res) => {
-    var post = req.body;
-    var title = post.title;
-    var description = post.description;
-    fs.writeFile(`data/${title}`, description, 'utf8', function (err) {
-        res.redirect(302, `/topic/${title}`);
-    })
-});
-
-router.get('/update/:pageId', (req, res) => {
-    var filteredId = path.parse(req.params.pageId).base;
-    fs.readFile(`data/${filteredId}`, 'utf8', function (err, description) {
-        var title = req.params.pageId;
-        var list = template.list(req.list);
-        var html = template.HTML(title, list,
-            `
-          <form action="/topic/update_process" method="post">
-            <input type="hidden" name="id" value="${title}">
-            <p><input type="text" name="title" placeholder="title" value="${title}"></p>
-            <p>
-              <textarea name="description" placeholder="description">${description}</textarea>
-            </p>
-            <p>
-              <input type="submit">
-            </p>
-          </form>
-          `,
-            `<a href="/topic/create">create</a> <a href="/topic/update/${title}">update</a>`
-        );
-        res.send(html);
+router.get('/logout', (req, res) => {
+    req.session.destroy((err)=>{
+        res.redirect('/');
     });
 });
-
-router.post('/update_process', (req, res) => {
-    var post = req.body;
-    var id = post.id;
-    var title = post.title;
-    var description = post.description;
-    fs.rename(`data/${id}`, `data/${title}`, (error) => {
-        fs.writeFile(`data/${title}`, description, 'utf8', function (err) {
-            res.redirect(302, `/topic/${title}`);
-        });
-    });
-});
-
-router.post('/delete_process', (req, res) => {
-    var post = req.body;
-    var id = post.id;
-    var filteredId = path.parse(id).base;
-    fs.unlink(`data/${filteredId}`, function (error) {
-        res.redirect(302, '/');
-    });
-});
-
-router.get('/:pageId', (req, res, next) => {    //url path 방식으로 parameter 전달하는 것을 처리하는 라우팅 기법 
-    var filteredId = path.parse(req.params.pageId).base;
-    fs.readFile(`data/${filteredId}`, 'utf8', function (err, description) {
-        if (err) {
-            next(err);    //error data 전달해주는 방법
-        } else {
-            var title = req.params.pageId;
-            var sanitizedTitle = sanitizeHtml(title);
-            var sanitizedDescription = sanitizeHtml(description, {
-                allowedTags: ['h1']
-            });
-            var list = template.list(req.list);
-            var html = template.HTML(sanitizedTitle, list,
-                `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
-                ` <a href="/topic/create">create</a>
-              <a href="/topic/update/${sanitizedTitle}">update</a>
-              <form action="/topic/delete_process" method="post">
-                <input type="hidden" name="id" value="${sanitizedTitle}">
-                <input type="submit" value="delete">
-              </form>`
-            );
-            res.send(html);
-        }
-    });
-});
-*/
 module.exports = router;
