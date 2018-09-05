@@ -18,6 +18,9 @@
     "url": "https://github.com/web-n/Nodejs/issues"
   },
   "homepage": "https://github.com/web-n/Nodejs#readme",
+  "nodeConfig": {
+    "ignore": ["sessions/*.json"]
+  },
   "dependencies": {
     "body-parser": "^1.18.3",
     "compression": "^1.7.3",

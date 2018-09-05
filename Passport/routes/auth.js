@@ -27,22 +27,22 @@ router.get('/login', (req, res) => {
     res.send(html);
 });
 
-router.post('/login_process', (req, res) => {
-    var post = req.body;
-    var email = post.email;
-    var password = post.password;
-    if(email === auth_data.email && password === auth_data.password) {
-        //success
-        req.session.is_logined = true;
-        req.session.username = auth_data.username;
-        req.session.save(() => {
-            res.redirect('/');
-        });     //세션 객체에 있는 데이터를 이 함수가 세션 스토어에 적용하는 작업을 바로 시작한다. 작업이 모두 끝나면 콜백함수 실행
-    } else {
-        res.end('Who are you????');
-    }
-    
-});
+//passport 에서 인증 구현하기 위해 기존 login process 주석처리
+// router.post('/login_process', (req, res) => {
+//     var post = req.body;
+//     var email = post.email;
+//     var password = post.password;
+//     if(email === auth_data.email && password === auth_data.password) {
+//         //success
+//         req.session.is_logined = true;
+//         req.session.username = auth_data.username;
+//         req.session.save(() => {
+//             res.redirect('/');
+//         });     //세션 객체에 있는 데이터를 이 함수가 세션 스토어에 적용하는 작업을 바로 시작한다. 작업이 모두 끝나면 콜백함수 실행
+//     } else {
+//         res.end('Who are you????');
+//     }
+// });
 
 router.get('/logout', (req, res) => {
     req.session.destroy((err)=>{
